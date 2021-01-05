@@ -1,4 +1,5 @@
 import 'package:ahmed_app/pages/custom_video_player.dart';
+import 'package:ahmed_app/pages/settings.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -50,7 +51,23 @@ class _HomeState extends State<Home> {
       key: _homeScaffoldState,
       drawer: SafeArea(
         child: Drawer(
-          child: ListView(children: drawerOptions),
+          child: ListView(
+            children: [
+              Column(children: drawerOptions),
+              Divider(thickness: 1, height: 2),
+              ListTile(
+                leading: Icon(Icons.settings),
+                title: Text('Settings'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => Settings()));
+                },
+              )
+            ],
+          ),
         ),
       ),
       body: _getDrawerItemWidget(_selectedDrawerIndex, _homeScaffoldState),

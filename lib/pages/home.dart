@@ -1,83 +1,50 @@
+import 'package:ahmed_app/pages/custom_music_player.dart';
 import 'package:ahmed_app/pages/custom_video_player.dart';
-import 'package:ahmed_app/pages/settings.dart';
+import 'package:ahmed_app/test.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
-  final drawerItems = [
-    DrawerItem('Video', Icons.movie),
-    DrawerItem('Audio', Icons.music_note),
-  ];
-
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  int _selectedDrawerIndex = 0;
-
-  _getDrawerItemWidget(int pos, GlobalKey<ScaffoldState> homeScaffoldState) {
-    switch (pos) {
-      case 0:
-        return CustomVideoPlayer(homeScaffoldState);
-      case 1:
-        return CustomVideoPlayer(homeScaffoldState);
-    }
-  }
-
-  _onSelectItem(int index) {
-    if (_selectedDrawerIndex == index) {
-      Navigator.of(context).pop();
-    } else {
-      setState(() => _selectedDrawerIndex = index);
-      Navigator.of(context).pop();
-    }
-  }
+  int _selectedIndex = 0;
+  final _widgetOptions = [
+    CustomVideoPlayer(),
+    CustomMusicPlayer(),
+    //MyAudioPlayer(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    var drawerOptions = <Widget>[];
-    for (int i = 0; i < widget.drawerItems.length; i++) {
-      DrawerItem drawerItem = widget.drawerItems[i];
-      drawerOptions.add(ListTile(
-        leading: Icon(drawerItem.icon),
-        title: Text(drawerItem.title),
-        selected: i == _selectedDrawerIndex,
-        onTap: () => _onSelectItem(i),
-      ));
-    }
-    final GlobalKey<ScaffoldState> _homeScaffoldState =
-        GlobalKey<ScaffoldState>();
     return Scaffold(
-      key: _homeScaffoldState,
-      drawer: SafeArea(
-        child: Drawer(
-          child: ListView(
-            children: [
-              Column(children: drawerOptions),
-              Divider(thickness: 1, height: 2),
-              ListTile(
-                leading: Icon(Icons.settings),
-                title: Text('Settings'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) => Settings()));
-                },
-              )
-            ],
-          ),
-        ),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _widgetOptions,
       ),
-      body: _getDrawerItemWidget(_selectedDrawerIndex, _homeScaffoldState),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.movie),
+            label: 'Videos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.music_note),
+            label: 'Music',
+          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.music_note),
+          //   label: 'Test',
+          // ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+      ),
     );
   }
-}
-
-class DrawerItem {
-  String title;
-  IconData icon;
-
-  DrawerItem(this.title, this.icon);
 }

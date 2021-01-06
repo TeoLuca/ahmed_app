@@ -26,6 +26,7 @@ dependencies:
   file_picker: ^2.1.4
   better_player: ^0.0.43
   dynamic_theme: ^1.0.0
+  just_audio: ^0.6.5
 
 
   # The following adds the Cupertino Icons font to your application.

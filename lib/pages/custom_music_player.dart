@@ -1,6 +1,7 @@
 import 'package:ahmed_app/components/audio_control_buttons.dart';
 import 'package:ahmed_app/components/seek_bar.dart';
 import 'package:ahmed_app/models/audio_metadata.dart';
+import 'package:ahmed_app/pages/playlist_page.dart';
 import 'package:ahmed_app/pages/settings.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -80,7 +81,12 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
           ),
           IconButton(
             icon: Icon(Icons.playlist_play),
-            onPressed: () async {},
+            onPressed: () async {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => PlaylistPage()));
+            },
           ),
           PopupMenuButton<String>(
             onSelected: choiceAction,
@@ -133,7 +139,8 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
                   final icons = [
                     Icon(Icons.repeat, color: Colors.grey),
                     Icon(Icons.repeat, color: Theme.of(context).primaryColor),
-                    Icon(Icons.repeat_one, color: Theme.of(context).primaryColor),
+                    Icon(Icons.repeat_one,
+                        color: Theme.of(context).primaryColor),
                   ];
                   const cycleModes = [
                     LoopMode.off,
@@ -164,7 +171,8 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
                   final shuffleModeEnabled = snapshot.data ?? false;
                   return IconButton(
                     icon: shuffleModeEnabled
-                        ? Icon(Icons.shuffle, color: Theme.of(context).primaryColor)
+                        ? Icon(Icons.shuffle,
+                            color: Theme.of(context).primaryColor)
                         : Icon(Icons.shuffle, color: Colors.grey),
                     onPressed: () async {
                       final enable = !shuffleModeEnabled;
@@ -194,13 +202,13 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
                         ? Theme.of(context).primaryColor
                         : null,
                     child: GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         _player.seek(Duration.zero, index: index);
                       },
                       child: Card(
                         child: Padding(
-                            padding:
-                                EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 8),
                             child: Text(
                               sequence[index].tag.title,
                               maxLines: 1,

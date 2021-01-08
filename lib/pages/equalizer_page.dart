@@ -2,6 +2,7 @@ import 'package:ahmed_app/components/custom_eq.dart';
 import 'package:equalizer/equalizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EqualizerPage extends StatefulWidget {
   @override
@@ -9,12 +10,24 @@ class EqualizerPage extends StatefulWidget {
 }
 
 class _EqualizerPageState extends State<EqualizerPage> {
+  SharedPreferences sharedPreferences;
+
   bool enableCustomEQ = false;
+
+  void initialize() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      enableCustomEQ = sharedPreferences.getBool('CUSTOM_EQ') ?? false;
+    });
+    print(enableCustomEQ);
+  }
 
   @override
   void initState() {
+    initialize();
     super.initState();
     Equalizer.init(0);
+    Equalizer.setEnabled(enableCustomEQ);
   }
 
   @override
@@ -27,7 +40,7 @@ class _EqualizerPageState extends State<EqualizerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Equalizer example'),
+        title: const Text('Equalizer'),
       ),
       body: ListView(
         children: [
@@ -66,6 +79,7 @@ class _EqualizerPageState extends State<EqualizerPage> {
                 setState(() {
                   enableCustomEQ = value;
                 });
+                sharedPreferences.setBool('CUSTOM_EQ', enableCustomEQ);
               },
             ),
           ),

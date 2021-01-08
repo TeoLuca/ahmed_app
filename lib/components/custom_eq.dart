@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:equalizer/equalizer.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomEQ extends StatefulWidget {
   const CustomEQ(this.enabled, this.bandLevelRange);
@@ -13,16 +14,36 @@ class CustomEQ extends StatefulWidget {
 }
 
 class _CustomEQState extends State<CustomEQ> {
+  SharedPreferences sharedPreferences;
+
   double min, max;
   String _selectedValue;
   Future<List<String>> fetchPresets;
 
-  @override
-  void initState() {
-    super.initState();
+  void initialize() async {
+    sharedPreferences = await SharedPreferences.getInstance();
     min = widget.bandLevelRange[0].toDouble();
     max = widget.bandLevelRange[1].toDouble();
     fetchPresets = Equalizer.getPresetNames();
+    String preset = sharedPreferences.getString('PRESET') ?? '';
+    bool customEQ = sharedPreferences.getBool('CUSTOM_EQ') ?? false;
+    if (customEQ == false) {
+      Equalizer.setPreset('Normal');
+      setState(() {
+        _selectedValue = 'Normal';
+      });
+    } else if (preset.length > 0) {
+      Equalizer.setPreset(preset);
+      setState(() {
+        _selectedValue = preset;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    initialize();
+    super.initState();
   }
 
   @override
@@ -62,7 +83,8 @@ class _CustomEQState extends State<CustomEQ> {
             future: Equalizer.getBandLevel(bandId),
             builder: (context, snapshot) {
               return FlutterSlider(
-                disabled: !widget.enabled,
+                //disabled: !widget.enabled,
+                disabled: true,
                 axis: Axis.vertical,
                 rtl: true,
                 min: min,
@@ -99,6 +121,7 @@ class _CustomEQState extends State<CustomEQ> {
                     setState(() {
                       _selectedValue = value;
                     });
+                    sharedPreferences.setString('PRESET', value);
                   }
                 : null,
             items: presets.map((String value) {

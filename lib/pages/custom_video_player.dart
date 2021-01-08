@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:better_player/better_player.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomVideoPlayer extends StatefulWidget {
   @override
@@ -20,19 +21,44 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
 
   BetterPlayerController _betterPlayerController;
 
-  void choiceAction(String choice) {
-    if (choice == Constants.Settings) {
+  SharedPreferences sharedPreferences;
+
+  void setupInitStateAsync() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+  }
+
+  @override
+  void initState() {
+    setupInitStateAsync();
+    super.initState();
+  }
+
+  void choiceAction(String choice) async {
+    if (choice == Constants.History) {
+      Video video = await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => RecentVideosPage()));
+      if (video != null) {
+        if (_betterPlayerController != null) {
+          _betterPlayerController
+              .setupDataSource(BetterPlayerDataSource.file(video.uri));
+        } else {
+          setupVideoPlayerController(video.uri);
+        }
+        sharedPreferences.setString('LAST_PLAYED_VIDEO_URI', video.uri);
+      }
+    } else if (choice == Constants.Settings) {
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) => Settings()));
     } else if (choice == Constants.About) {
-      print('Subscribe');
+      print('About page');
     }
   }
 
   Future<PlatformFile> pickFile() async {
     FilePickerResult result =
         await FilePicker.platform.pickFiles(type: FileType.video);
-
     if (result != null) {
       return result.files.single;
     }
@@ -98,22 +124,21 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
                   );
                 } else
                   setupVideoPlayerController(file.path);
+                sharedPreferences.setString('LAST_PLAYED_VIDEO_URI', file.path);
               }
             },
           ),
           IconButton(
-            icon: Icon(Icons.access_time_rounded),
+            icon: Icon(Icons.history),
             onPressed: () async {
-              Video video = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => RecentVideosPage()));
-              if (video != null) {
+              String lastPlayedVideoUri =
+                  sharedPreferences.getString('LAST_PLAYED_VIDEO_URI');
+              if (lastPlayedVideoUri != null) {
                 if (_betterPlayerController != null) {
-                  _betterPlayerController
-                      .setupDataSource(BetterPlayerDataSource.file(video.uri));
+                  _betterPlayerController.setupDataSource(
+                      BetterPlayerDataSource.file(lastPlayedVideoUri));
                 } else {
-                  setupVideoPlayerController(video.uri);
+                  setupVideoPlayerController(lastPlayedVideoUri);
                 }
               }
             },
@@ -150,8 +175,9 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
 }
 
 class Constants {
+  static const String History = 'History';
   static const String Settings = 'Settings';
   static const String About = 'About';
 
-  static const List<String> choices = <String>[Settings, About];
+  static const List<String> choices = <String>[History, Settings, About];
 }

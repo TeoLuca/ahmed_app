@@ -52,11 +52,12 @@ class _PlaylistPageState extends State<PlaylistPage> {
 
   void _delete(BuildContext context, int id) async {
     int result = await databaseHelper.deletePlaylist(id);
-    if (result != 0) {
-      _showSnackBar(context, 'Task deleted successfully');
+    var result2 = await databaseHelper.dropSinglePlaylistTable(id);
+    if (result != 0 && result2.isEmpty) {
+      _showSnackBar(context, 'Playlist deleted successfully');
       updateListView();
     } else {
-      _showSnackBar(context, 'Error occurred while deleting task');
+      _showSnackBar(context, 'Error occurred while deleting Playlist');
       updateListView();
     }
   }
@@ -75,7 +76,12 @@ class _PlaylistPageState extends State<PlaylistPage> {
           return ListTile(
             leading: IconButton(
               icon: Icon(Icons.play_arrow),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pop(
+                  context,
+                  playlists[index],
+                );
+              },
             ),
             title: Text(playlists[index].title, maxLines: 1),
             trailing: IconButton(

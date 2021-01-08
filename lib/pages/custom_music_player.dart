@@ -1,8 +1,10 @@
 import 'package:ahmed_app/components/audio_control_buttons.dart';
 import 'package:ahmed_app/components/seek_bar.dart';
-import 'package:ahmed_app/models/audio_metadata.dart';
+import 'package:ahmed_app/models/playlist.dart';
+import 'package:ahmed_app/models/song.dart';
 import 'package:ahmed_app/pages/playlist_page.dart';
 import 'package:ahmed_app/pages/settings.dart';
+import 'package:ahmed_app/services/database_helper.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +17,10 @@ class CustomMusicPlayer extends StatefulWidget {
 }
 
 class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
+  DatabaseHelper databaseHelper = DatabaseHelper();
   AudioPlayer _player;
+  Playlist playlist;
+  String playlistTitle = 'Playlist';
 
   void choiceAction(String choice) {
     if (choice == Constants.Settings) {
@@ -37,11 +42,58 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
     return null;
   }
 
-  _init(AudioSource audioSource) async {
+  _initSong(AudioSource audioSource) async {
+    setState(() {
+      playlistTitle = 'Playlist';
+    });
     final session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration.speech());
     try {
       await _player.setAudioSource(audioSource);
+      await _player.play();
+    } catch (e) {
+      // catch load errors: 404, invalid url ...
+      print("An error occured $e");
+    }
+  }
+
+  _initPlaylist(int id) async {
+    List<Song> songs = await databaseHelper.getSinglePlaylistList(id);
+
+    ConcatenatingAudioSource playlist = ConcatenatingAudioSource(children: [
+      // LoopingAudioSource(
+      //   count: 1,
+      //   child: ClippingAudioSource(
+      //     start: Duration(seconds: 60),
+      //     end: Duration(seconds: 65),
+      //     child: AudioSource.uri(
+      //       Uri.parse(songs[0].uri),
+      //     ),
+      //     tag: songs[0],
+      //     // child: AudioSource.uri(Uri.parse(
+      //     //     "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")),
+      //     // tag: AudioMetadata(
+      //     //   album: "Science Friday",
+      //     //   title: "A Salute To Head-Scratching Science (5 seconds)",
+      //     //   artwork:
+      //     //       "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
+      //     // ),
+      //   ),
+      // ),
+    ]);
+
+    for (int i = 0; i < songs.length; i++) {
+      playlist.add(
+        AudioSource.uri(
+          Uri.parse(songs[i].uri),
+          tag: songs[i],
+        ),
+      );
+    }
+    final session = await AudioSession.instance;
+    await session.configure(AudioSessionConfiguration.speech());
+    try {
+      await _player.setAudioSource(playlist);
       await _player.play();
     } catch (e) {
       // catch load errors: 404, invalid url ...
@@ -71,21 +123,30 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
             icon: Icon(Icons.library_music),
             onPressed: () async {
               PlatformFile file = await pickFile();
-              _init(
-                AudioSource.uri(
-                  Uri.parse(file.path),
-                  tag: AudioMetadata(title: file.name),
-                ),
-              );
+              if (file != null) {
+                _initSong(
+                  AudioSource.uri(
+                    Uri.parse(file.path),
+                    tag: Song(file.path, file.name),
+                  ),
+                );
+              }
             },
           ),
           IconButton(
             icon: Icon(Icons.playlist_play),
             onPressed: () async {
-              Navigator.push(
+              Playlist playlist = await Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (BuildContext context) => PlaylistPage()));
+              if (playlist != null) {
+                setState(() {
+                  this.playlist = playlist;
+                  this.playlistTitle = playlist.title;
+                });
+                _initPlaylist(playlist.id);
+              }
             },
           ),
           PopupMenuButton<String>(
@@ -160,7 +221,7 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
               ),
               Expanded(
                 child: Text(
-                  "Playlist",
+                  playlistTitle,
                   style: Theme.of(context).textTheme.headline6,
                   textAlign: TextAlign.center,
                 ),

@@ -6,11 +6,13 @@ import 'package:ahmed_app/pages/equalizer_page.dart';
 import 'package:ahmed_app/pages/playlist_page.dart';
 import 'package:ahmed_app/pages/settings.dart';
 import 'package:ahmed_app/services/database_helper.dart';
+import 'package:equalizer/equalizer.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomMusicPlayer extends StatefulWidget {
   @override
@@ -85,10 +87,23 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
     }
   }
 
+  void initialize() async {
+    Equalizer.init(0);
+    Equalizer.setEnabled(true);
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String preset = sharedPreferences.getString('PRESET') ?? '';
+    if (preset.length == 0) {
+      Equalizer.setPreset('Normal');
+    } else if (preset.length > 0) {
+      Equalizer.setPreset(preset);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
+    initialize();
   }
 
   @override

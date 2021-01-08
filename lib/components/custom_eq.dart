@@ -4,9 +4,8 @@ import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomEQ extends StatefulWidget {
-  const CustomEQ(this.enabled, this.bandLevelRange);
+  const CustomEQ(this.bandLevelRange);
 
-  final bool enabled;
   final List<int> bandLevelRange;
 
   @override
@@ -26,8 +25,7 @@ class _CustomEQState extends State<CustomEQ> {
     max = widget.bandLevelRange[1].toDouble();
     fetchPresets = Equalizer.getPresetNames();
     String preset = sharedPreferences.getString('PRESET') ?? '';
-    bool customEQ = sharedPreferences.getBool('CUSTOM_EQ') ?? false;
-    if (customEQ == false) {
+    if (preset.length == 0) {
       Equalizer.setPreset('Normal');
       setState(() {
         _selectedValue = 'Normal';
@@ -83,7 +81,6 @@ class _CustomEQState extends State<CustomEQ> {
             future: Equalizer.getBandLevel(bandId),
             builder: (context, snapshot) {
               return FlutterSlider(
-                //disabled: !widget.enabled,
                 disabled: true,
                 axis: Axis.vertical,
                 rtl: true,
@@ -115,15 +112,13 @@ class _CustomEQState extends State<CustomEQ> {
               border: OutlineInputBorder(),
             ),
             value: _selectedValue,
-            onChanged: widget.enabled
-                ? (String value) {
-                    Equalizer.setPreset(value);
-                    setState(() {
-                      _selectedValue = value;
-                    });
-                    sharedPreferences.setString('PRESET', value);
-                  }
-                : null,
+            onChanged: (String value) {
+              Equalizer.setPreset(value);
+              setState(() {
+                _selectedValue = value;
+              });
+              sharedPreferences.setString('PRESET', value);
+            },
             items: presets.map((String value) {
               return DropdownMenuItem<String>(
                 value: value,

@@ -1,4 +1,7 @@
+import 'package:ahmed_app/models/video.dart';
+import 'package:ahmed_app/pages/recent_videos_page.dart';
 import 'package:ahmed_app/pages/settings.dart';
+import 'package:ahmed_app/services/database_helper.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +16,8 @@ class CustomVideoPlayer extends StatefulWidget {
 class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
   _CustomVideoPlayerState();
 
+  DatabaseHelper databaseHelper = DatabaseHelper();
+
   BetterPlayerController _betterPlayerController;
 
   void choiceAction(String choice) {
@@ -24,22 +29,25 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
     }
   }
 
-  Future<String> pickFile() async {
+  Future<PlatformFile> pickFile() async {
     FilePickerResult result =
         await FilePicker.platform.pickFiles(type: FileType.video);
 
     if (result != null) {
-      return result.files.single.path;
+      return result.files.single;
     }
     print('Operation Cancelled!');
     return null;
   }
 
-  void setupVideoPlayerController(String filePath) {
+  void setupVideoPlayerController(String path) {
     setState(() {
       BetterPlayerDataSource betterPlayerDataSource =
-          BetterPlayerDataSource(BetterPlayerDataSourceType.file, filePath);
-      _betterPlayerController = BetterPlayerController(
+          new BetterPlayerDataSource(
+        BetterPlayerDataSourceType.file,
+        path,
+      );
+      _betterPlayerController = new BetterPlayerController(
         BetterPlayerConfiguration(
           fit: BoxFit.contain,
           fullScreenByDefault: true,
@@ -76,12 +84,39 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
           IconButton(
             icon: Icon(Icons.video_library),
             onPressed: () async {
-              setupVideoPlayerController(await pickFile());
+              PlatformFile file = await pickFile();
+              if (file != null) {
+                Video video = Video(file.path, file.name);
+                bool isVideoInDatabase =
+                    await databaseHelper.isVideoInDatabase(file.path);
+                if (isVideoInDatabase == false) {
+                  databaseHelper.insertVideo(video);
+                }
+                if (_betterPlayerController != null) {
+                  _betterPlayerController.setupDataSource(
+                    BetterPlayerDataSource.file(file.path),
+                  );
+                } else
+                  setupVideoPlayerController(file.path);
+              }
             },
           ),
           IconButton(
             icon: Icon(Icons.access_time_rounded),
-            onPressed: () {},
+            onPressed: () async {
+              Video video = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => RecentVideosPage()));
+              if (video != null) {
+                if (_betterPlayerController != null) {
+                  _betterPlayerController
+                      .setupDataSource(BetterPlayerDataSource.file(video.uri));
+                } else {
+                  setupVideoPlayerController(video.uri);
+                }
+              }
+            },
           ),
           PopupMenuButton<String>(
             onSelected: choiceAction,

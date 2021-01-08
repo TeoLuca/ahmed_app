@@ -1,5 +1,6 @@
 import 'package:ahmed_app/models/playlist.dart';
 import 'package:ahmed_app/models/song.dart';
+import 'package:ahmed_app/models/video.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io';
@@ -10,6 +11,7 @@ class DatabaseHelper {
 
   String tablePlaylists = 'table_playlists';
   String tableSinglePlaylist = 'table_playlist_'; // table_playlist_id
+  String tableRecentVideos = 'table_recent_videos';
 
   String colId = 'id';
   String colTitle = 'title';
@@ -46,6 +48,13 @@ class DatabaseHelper {
         '('
         '$colId INTEGER PRIMARY KEY AUTOINCREMENT,'
         '$colTitle TEXT'
+        ')');
+
+    await db.execute('CREATE TABLE $tableRecentVideos'
+        '('
+        '$colId INTEGER PRIMARY KEY AUTOINCREMENT,'
+        '$colTitle TEXT,'
+        '$colUri TEXT'
         ')');
   }
 
@@ -169,5 +178,42 @@ class DatabaseHelper {
     var result = await db.rawDelete(
         'DELETE FROM $tableSinglePlaylist$tableId WHERE $colId = $songId');
     return result;
+  }
+
+  //--------------------R E C E N T  V I D E O S--------------------------------------
+  Future<List<Map<String, dynamic>>> getRecentVideosMapList() async {
+    Database db = await this.database;
+    var result = await db.rawQuery('SELECT * FROM $tableRecentVideos');
+    return result;
+  }
+
+  Future<List<Video>> getRecentVideosList() async {
+    var recentVideosMapList = await getRecentVideosMapList();
+    int count = recentVideosMapList.length;
+    List<Video> recentVideos = List<Video>();
+    for (int i = 0; i < count; i++) {
+      recentVideos.add(Video.fromMapToObject(recentVideosMapList[i]));
+    }
+    return recentVideos;
+  }
+
+  Future<int> insertVideo(Video video) async {
+    Database db = await this.database;
+    var result = await db.insert('$tableRecentVideos', video.toMap());
+    return result;
+  }
+
+  Future<int> deleteVideo(int id) async {
+    Database db = await this.database;
+    var result =
+        await db.rawDelete('DELETE FROM $tableRecentVideos WHERE $colId = $id');
+    return result;
+  }
+
+  Future<bool> isVideoInDatabase(String uri) async {
+    Database db = await this.database;
+    var result = await db
+        .rawQuery('SELECT * FROM $tableRecentVideos WHERE $colUri = \"$uri\"');
+    return result.isEmpty ? false : true;
   }
 }

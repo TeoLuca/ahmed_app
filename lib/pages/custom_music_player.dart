@@ -60,27 +60,7 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
   _initPlaylist(int id) async {
     List<Song> songs = await databaseHelper.getSinglePlaylistList(id);
 
-    ConcatenatingAudioSource playlist = ConcatenatingAudioSource(children: [
-      // LoopingAudioSource(
-      //   count: 1,
-      //   child: ClippingAudioSource(
-      //     start: Duration(seconds: 60),
-      //     end: Duration(seconds: 65),
-      //     child: AudioSource.uri(
-      //       Uri.parse(songs[0].uri),
-      //     ),
-      //     tag: songs[0],
-      //     // child: AudioSource.uri(Uri.parse(
-      //     //     "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")),
-      //     // tag: AudioMetadata(
-      //     //   album: "Science Friday",
-      //     //   title: "A Salute To Head-Scratching Science (5 seconds)",
-      //     //   artwork:
-      //     //       "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
-      //     // ),
-      //   ),
-      // ),
-    ]);
+    ConcatenatingAudioSource playlist = ConcatenatingAudioSource(children: []);
 
     for (int i = 0; i < songs.length; i++) {
       playlist.add(

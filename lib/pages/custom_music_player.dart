@@ -229,40 +229,35 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
           ),
           //----------------------------------------------------------------------------
           Container(
-            height: 240.0,
             child: StreamBuilder<SequenceState>(
               stream: _player.sequenceStateStream,
               builder: (context, snapshot) {
                 final state = snapshot.data;
                 final sequence = state?.sequence ?? [];
-                return ListView.builder(
-                  itemCount: sequence.length,
-                  itemBuilder: (context, index) => Material(
-                    color: index == state.currentIndex
-                        //? Colors.grey.shade300
-                        ? Theme.of(context).primaryColor
-                        : null,
-                    child: GestureDetector(
-                      onTap: () {
-                        _player.seek(Duration.zero, index: index);
-                      },
-                      child: Card(
-                        child: Padding(
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: sequence.length,
+                    itemBuilder: (context, index) => Material(
+                      color: index == state.currentIndex
+                          ? Theme.of(context).primaryColor
+                          : null,
+                      child: GestureDetector(
+                        onTap: () {
+                          _player.seek(Duration.zero, index: index);
+                        },
+                        child: Card(
+                          child: Padding(
                             padding: EdgeInsets.symmetric(
                                 vertical: 16, horizontal: 8),
                             child: Text(
                               sequence[index].tag.title,
                               maxLines: 1,
                               style: TextStyle(fontSize: 16),
-                            )),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                    // ListTile(
-                    //   title: Text(sequence[index].tag.title, maxLines: 1,),
-                    //   onTap: () {
-                    //     _player.seek(Duration.zero, index: index);
-                    //   },
-                    // ),
                   ),
                 );
               },

@@ -100,13 +100,58 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text(playlist.title),
           actions: [
             playlist.id == null
                 ? Container()
                 : IconButton(
                     icon: Icon(Icons.edit),
-                    onPressed: () {},
+                    onPressed: () {
+                      TextEditingController editTitleController =
+                          TextEditingController();
+                      editTitleController.text = playlist.title;
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: Text('Edit playlist'),
+                          content: TextField(
+                            controller: editTitleController,
+                            decoration: InputDecoration(
+                              labelText: 'Title',
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5)),
+                              ),
+                            ),
+                          ),
+                          actions: [
+                            FlatButton(
+                              onPressed: () async {
+                                setState(() {
+                                  playlist.title = editTitleController.text;
+                                });
+                                int response = await databaseHelper
+                                    .updatePlaylist(playlist);
+                                Navigator.pop(context);
+                                if (response != 0) {
+                                  _showAlertDialog(
+                                      'Status', 'Playlist updated');
+                                } else {
+                                  _showAlertDialog('Status', 'Error occured');
+                                }
+                              },
+                              child: Text('Update'),
+                            ),
+                            FlatButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Cancel'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
           ],
         ),
@@ -152,8 +197,53 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
                     leading: IconButton(
-                      icon: Icon(Icons.play_arrow),
-                      onPressed: () {},
+                      icon: Icon(Icons.edit),
+                      onPressed: () {
+                        TextEditingController editTitleController =
+                            TextEditingController();
+                        editTitleController.text = songs[index].title;
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            title: Text('Edit song'),
+                            content: TextField(
+                              controller: editTitleController,
+                              decoration: InputDecoration(
+                                labelText: 'Name',
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                ),
+                              ),
+                            ),
+                            actions: [
+                              FlatButton(
+                                onPressed: () async {
+                                  setState(() {
+                                    songs[index].title =
+                                        editTitleController.text;
+                                  });
+                                  int response = await databaseHelper
+                                      .updateSong(playlist.id, songs[index]);
+                                  Navigator.pop(context);
+                                  if (response != 0) {
+                                    _showAlertDialog('Status', 'Song updated');
+                                  } else {
+                                    _showAlertDialog('Status', 'Error occured');
+                                  }
+                                },
+                                child: Text('Update'),
+                              ),
+                              FlatButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Cancel'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                     title: Text(songs[index].title),
                     trailing: IconButton(

@@ -106,7 +106,7 @@ class DatabaseHelper {
   Future<int> updatePlaylist(Playlist playlist) async {
     Database db = await this.database;
     var result = await db.rawUpdate('UPDATE $tablePlaylists SET '
-        '$colTitle = ${playlist.title} '
+        '$colTitle = \"${playlist.title}\" '
         'WHERE $colId = ${playlist.id}');
     return result;
   }
@@ -170,6 +170,14 @@ class DatabaseHelper {
   Future<int> insertSong(int tableId, Song song) async {
     Database db = await this.database;
     var result = await db.insert('$tableSinglePlaylist$tableId', song.toMap());
+    return result;
+  }
+
+  Future<int> updateSong(int tableId, Song song) async {
+    Database db = await this.database;
+    var result = await db.rawUpdate('UPDATE $tableSinglePlaylist$tableId SET '
+        '$colTitle = \"${song.title}\" '
+        'WHERE $colId = ${song.id}');
     return result;
   }
 

@@ -2,6 +2,7 @@ import 'package:ahmed_app/components/audio_control_buttons.dart';
 import 'package:ahmed_app/components/seek_bar.dart';
 import 'package:ahmed_app/models/playlist.dart';
 import 'package:ahmed_app/models/song.dart';
+import 'package:ahmed_app/pages/equalizer_page.dart';
 import 'package:ahmed_app/pages/playlist_page.dart';
 import 'package:ahmed_app/pages/settings.dart';
 import 'package:ahmed_app/services/database_helper.dart';
@@ -23,7 +24,10 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
   String playlistTitle = 'Playlist';
 
   void choiceAction(String choice) {
-    if (choice == Constants.Settings) {
+    if (choice == Constants.Equalizer) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => EqualizerPage()));
+    } else if (choice == Constants.Settings) {
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) => Settings()));
     } else if (choice == Constants.About) {
@@ -270,8 +274,9 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
 }
 
 class Constants {
+  static const String Equalizer = 'Equalizer';
   static const String Settings = 'Settings';
   static const String About = 'About';
 
-  static const List<String> choices = <String>[Settings, About];
+  static const List<String> choices = <String>[Equalizer, Settings, About];
 }

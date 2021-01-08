@@ -85,7 +85,8 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
           autoPlay: true,
           allowedScreenSleep: false,
           controlsConfiguration: BetterPlayerControlsConfiguration(
-            enableSkips: false,
+            enableSkips: true,
+            skipsTimeInMilliseconds: 10000, //10000
           ),
         ),
         betterPlayerDataSource: betterPlayerDataSource,

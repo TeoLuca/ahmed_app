@@ -23,6 +23,15 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
 
   SharedPreferences sharedPreferences;
 
+  List<BoxFit> videoBoxFit = [
+    BoxFit.contain,
+    BoxFit.cover,
+    BoxFit.fill,
+    BoxFit.fitHeight,
+    BoxFit.fitWidth,
+  ];
+  int videoBoxFitIndex = 0;
+
   void setupInitStateAsync() async {
     sharedPreferences = await SharedPreferences.getInstance();
   }
@@ -57,8 +66,23 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
   }
 
   Future<PlatformFile> pickFile() async {
-    FilePickerResult result =
-        await FilePicker.platform.pickFiles(type: FileType.video);
+    FilePickerResult result = await FilePicker.platform.pickFiles(
+      type: FileType.video,
+      withData: false,
+    );
+    if (result != null) {
+      return result.files.single;
+    }
+    print('Operation Cancelled!');
+    return null;
+  }
+
+  Future<PlatformFile> pickSubtitle() async {
+    FilePicker.platform.clearTemporaryFiles();
+    FilePickerResult result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['srt'],
+    );
     if (result != null) {
       return result.files.single;
     }
@@ -75,7 +99,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
       );
       _betterPlayerController = new BetterPlayerController(
         BetterPlayerConfiguration(
-          fit: BoxFit.contain,
+          fit: videoBoxFit[videoBoxFitIndex],
           fullScreenByDefault: true,
           autoDetectFullscreenDeviceOrientation: true,
           deviceOrientationsAfterFullScreen: [
@@ -87,6 +111,26 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
           controlsConfiguration: BetterPlayerControlsConfiguration(
             enableSkips: true,
             skipsTimeInMilliseconds: 10000, //10000
+            enableSubtitles: false,
+            enableQualities: false,
+            overflowMenuCustomItems: [
+              BetterPlayerOverflowMenuItem(
+                Icons.closed_caption,
+                'Closed Captions',
+                () async {
+                  PlatformFile file = await pickSubtitle();
+                  if (file != null) {
+                    _betterPlayerController.setupSubtitleSource(
+                      BetterPlayerSubtitlesSource(
+                        type: BetterPlayerSubtitlesSourceType.file,
+                        urls: [file.path],
+                      ),
+                    );
+                    print(file.name);
+                  }
+                },
+              )
+            ],
           ),
         ),
         betterPlayerDataSource: betterPlayerDataSource,
@@ -157,19 +201,21 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          _betterPlayerController != null
-              ? BetterPlayer(
-                  controller: _betterPlayerController,
-                )
-              : Padding(
-                  padding: EdgeInsets.all(30),
-                  child: Center(
-                    child: Text('Open a video'),
+      body: Container(
+        child: _betterPlayerController != null
+            ? Column(
+                children: [
+                  BetterPlayer(
+                    controller: _betterPlayerController,
                   ),
+                ],
+              )
+            : Padding(
+                padding: EdgeInsets.all(30),
+                child: Center(
+                  child: Text('Open a video'),
                 ),
-        ],
+              ),
       ),
     );
   }

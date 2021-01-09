@@ -1,4 +1,3 @@
-import 'package:ahmed_app/models/playlist.dart';
 import 'package:ahmed_app/models/song.dart';
 import 'package:ahmed_app/services/database_helper.dart';
 import 'package:flutter/material.dart';

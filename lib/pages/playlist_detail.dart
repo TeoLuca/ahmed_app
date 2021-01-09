@@ -1,6 +1,5 @@
 import 'package:ahmed_app/models/playlist.dart';
 import 'package:ahmed_app/models/song.dart';
-import 'package:ahmed_app/pages/song_detail.dart';
 import 'package:ahmed_app/services/database_helper.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';

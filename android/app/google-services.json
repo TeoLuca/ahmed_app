@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "212372558699",
+    "project_id": "bee-player",
+    "storage_bucket": "bee-player.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:212372558699:android:a63e3c698c93cc2e50322e",
+        "android_client_info": {
+          "package_name": "com.fourbrothers.beeplayer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "212372558699-4h2uh12ffn2557tsmd3er03gpi6t2c6n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBva6RZj3oS_D6inRBaprBcDfnQn_37PV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "212372558699-4h2uh12ffn2557tsmd3er03gpi6t2c6n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

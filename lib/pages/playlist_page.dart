@@ -1,6 +1,8 @@
+import 'package:ahmed_app/constants.dart';
 import 'package:ahmed_app/models/playlist.dart';
 import 'package:ahmed_app/pages/playlist_detail.dart';
 import 'package:ahmed_app/services/database_helper.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -68,40 +70,65 @@ class _PlaylistPageState extends State<PlaylistPage> {
       playlists = List<Playlist>();
       updateListView();
     }
-    return Scaffold(
-      appBar: AppBar(title: Text('Playlists')),
-      body: ListView.builder(
-        itemCount: count,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            leading: IconButton(
-              icon: Icon(Icons.play_arrow),
-              onPressed: () {
-                Navigator.pop(
-                  context,
-                  playlists[index],
+    return SafeArea(
+      child: Scaffold(
+        body: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: AppBar(
+                title: Text('Playlists'),
+                shape: appBarShape,
+                elevation: menuElevation,
+              ),
+            ),
+            ListView.builder(
+              padding: EdgeInsets.only(bottom: 8, right: 8, left: 8),
+              shrinkWrap: true,
+              itemCount: count,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(30),
+                    ),
+                  ),
+                  elevation: itemElevation,
+                  child: ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.play_arrow),
+                      onPressed: () {
+                        Navigator.pop(
+                          context,
+                          playlists[index],
+                        );
+                      },
+                    ),
+                    title: Text(playlists[index].title, maxLines: 1),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        _delete(context, this.playlists[index].id);
+                      },
+                    ),
+                    onTap: () {
+                      navigateToDetail(
+                          playlists[index], playlists[index].title);
+                    },
+                  ),
                 );
               },
             ),
-            title: Text(playlists[index].title, maxLines: 1),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                _delete(context, this.playlists[index].id);
-              },
-            ),
-            onTap: () {
-              navigateToDetail(playlists[index], playlists[index].title);
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          navigateToDetail(Playlist(''), 'Add playlist');
-        },
-        child: Icon(Icons.add),
-        tooltip: 'Add Playlist',
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: DynamicTheme.of(context).data.primaryColor,
+          onPressed: () {
+            navigateToDetail(Playlist(''), 'Add playlist');
+          },
+          child: Icon(Icons.add),
+          tooltip: 'Add Playlist',
+        ),
       ),
     );
   }

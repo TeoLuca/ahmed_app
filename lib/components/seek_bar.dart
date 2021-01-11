@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 
 class SeekBar extends StatefulWidget {
@@ -26,6 +27,8 @@ class _SeekBarState extends State<SeekBar> {
     return Stack(
       children: [
         Slider(
+          activeColor: Colors.black,
+          inactiveColor: Colors.grey[600],
           min: 0.0,
           max: widget.duration.inMilliseconds.toDouble(),
           value: min(_dragValue ?? widget.position.inMilliseconds.toDouble(),
@@ -50,10 +53,10 @@ class _SeekBarState extends State<SeekBar> {
           bottom: 0.0,
           child: Text(
               RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$')
-                  .firstMatch("$_remaining")
-                  ?.group(1) ??
+                      .firstMatch("$_remaining")
+                      ?.group(1) ??
                   '$_remaining',
-              style: Theme.of(context).textTheme.caption),
+              style: TextStyle(color: Colors.black)),
         ),
       ],
     );

@@ -1,7 +1,9 @@
+import 'package:ahmed_app/constants.dart';
 import 'package:ahmed_app/models/video.dart';
 import 'package:ahmed_app/pages/recent_videos_page.dart';
 import 'package:ahmed_app/pages/settings.dart';
 import 'package:ahmed_app/services/database_helper.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -60,8 +62,6 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
     } else if (choice == Constants.Settings) {
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) => Settings()));
-    } else if (choice == Constants.About) {
-      print('About page');
     }
   }
 
@@ -148,74 +148,136 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Video Player'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.video_library),
-            onPressed: () async {
-              PlatformFile file = await pickFile();
-              if (file != null) {
-                Video video = Video(file.path, file.name);
-                bool isVideoInDatabase =
-                    await databaseHelper.isVideoInDatabase(file.path);
-                if (isVideoInDatabase == false) {
-                  databaseHelper.insertVideo(video);
-                }
-                if (_betterPlayerController != null) {
-                  _betterPlayerController.setupDataSource(
-                    BetterPlayerDataSource.file(file.path),
-                  );
-                } else
-                  setupVideoPlayerController(file.path);
-                sharedPreferences.setString('LAST_PLAYED_VIDEO_URI', file.path);
-              }
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.history),
-            onPressed: () async {
-              String lastPlayedVideoUri =
-                  sharedPreferences.getString('LAST_PLAYED_VIDEO_URI');
-              if (lastPlayedVideoUri != null) {
-                if (_betterPlayerController != null) {
-                  _betterPlayerController.setupDataSource(
-                      BetterPlayerDataSource.file(lastPlayedVideoUri));
-                } else {
-                  setupVideoPlayerController(lastPlayedVideoUri);
-                }
-              }
-            },
-          ),
-          PopupMenuButton<String>(
-            onSelected: choiceAction,
-            itemBuilder: (BuildContext context) {
-              return Constants.choices.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
-        ],
-      ),
-      body: Container(
-        child: _betterPlayerController != null
-            ? Column(
-                children: [
-                  BetterPlayer(
-                    controller: _betterPlayerController,
-                  ),
-                ],
-              )
-            : Padding(
-                padding: EdgeInsets.all(30),
-                child: Center(
-                  child: Text('Open a video'),
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.all(8),
+        child: Scaffold(
+          appBar: AppBar(
+            elevation: menuElevation,
+            shape: appBarShape,
+            title: RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 25,
                 ),
+                children: [
+                  TextSpan(
+                    text: 'Bee',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(text: ' Player'),
+                ],
               ),
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(
+                  Icons.video_library,
+                ),
+                onPressed: () async {
+                  PlatformFile file = await pickFile();
+                  if (file != null) {
+                    Video video = Video(file.path, file.name);
+                    bool isVideoInDatabase =
+                        await databaseHelper.isVideoInDatabase(file.path);
+                    if (isVideoInDatabase == false) {
+                      databaseHelper.insertVideo(video);
+                    }
+                    if (_betterPlayerController != null) {
+                      _betterPlayerController.setupDataSource(
+                        BetterPlayerDataSource.file(file.path),
+                      );
+                    } else
+                      setupVideoPlayerController(file.path);
+                    sharedPreferences.setString(
+                        'LAST_PLAYED_VIDEO_URI', file.path);
+                  }
+                },
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.history,
+                ),
+                onPressed: () async {
+                  String lastPlayedVideoUri =
+                      sharedPreferences.getString('LAST_PLAYED_VIDEO_URI');
+                  if (lastPlayedVideoUri != null) {
+                    if (_betterPlayerController != null) {
+                      _betterPlayerController.setupDataSource(
+                          BetterPlayerDataSource.file(lastPlayedVideoUri));
+                    } else {
+                      setupVideoPlayerController(lastPlayedVideoUri);
+                    }
+                  }
+                },
+              ),
+              PopupMenuButton<String>(
+                onSelected: choiceAction,
+                itemBuilder: (BuildContext context) {
+                  return Constants.choices.map((String choice) {
+                    return PopupMenuItem<String>(
+                      value: choice,
+                      child: Text(choice),
+                    );
+                  }).toList();
+                },
+              ),
+            ],
+          ),
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                margin: EdgeInsets.only(top: 8),
+                child: _betterPlayerController != null
+                    ? Column(
+                        children: [
+                          BetterPlayer(
+                            controller: _betterPlayerController,
+                          ),
+                        ],
+                      )
+                    : Container(),
+              ),
+              FlatButton.icon(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(30),
+                  ),
+                ),
+                color: DynamicTheme.of(context).data.primaryColor,
+                icon: Icon(
+                  Icons.video_library,
+                  color: Colors.black,
+                ),
+                label: Text(
+                  'Open video',
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () async {
+                  PlatformFile file = await pickFile();
+                  if (file != null) {
+                    Video video = Video(file.path, file.name);
+                    bool isVideoInDatabase =
+                        await databaseHelper.isVideoInDatabase(file.path);
+                    if (isVideoInDatabase == false) {
+                      databaseHelper.insertVideo(video);
+                    }
+                    if (_betterPlayerController != null) {
+                      _betterPlayerController.setupDataSource(
+                        BetterPlayerDataSource.file(file.path),
+                      );
+                    } else
+                      setupVideoPlayerController(file.path);
+                    sharedPreferences.setString(
+                        'LAST_PLAYED_VIDEO_URI', file.path);
+                  }
+                },
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -224,7 +286,6 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
 class Constants {
   static const String History = 'History';
   static const String Settings = 'Settings';
-  static const String About = 'About';
 
-  static const List<String> choices = <String>[History, Settings, About];
+  static const List<String> choices = <String>[History, Settings];
 }

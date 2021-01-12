@@ -32,7 +32,7 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
   void choiceAction(String choice) {
     if (choice == Constants.Equalizer) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (_) => EqualizerPage()));
+          context, MaterialPageRoute(builder: (context) => EqualizerPage()));
     } else if (choice == Constants.Settings) {
       Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) => Settings()));
@@ -108,9 +108,9 @@ class _CustomMusicPlayerState extends State<CustomMusicPlayer> {
 
   @override
   void initState() {
-    super.initState();
     _player = AudioPlayer();
     initialize();
+    super.initState();
   }
 
   @override

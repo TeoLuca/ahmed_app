@@ -31,8 +31,8 @@ class _SettingsState extends State<Settings> {
   void _loadRewardedAd() async {
     await RewardedVideoAd.instance.load(
       targetingInfo: MobileAdTargetingInfo(),
-      //adUnitId: AdManager.rewardedAdUnitId,
-      adUnitId: RewardedVideoAd.testAdUnitId,
+      adUnitId: AdManager.rewardedAdUnitId,
+      //adUnitId: RewardedVideoAd.testAdUnitId,
     );
   }
 
@@ -85,8 +85,8 @@ class _SettingsState extends State<Settings> {
     setupTheme();
     super.initState();
     _bannerAd = BannerAd(
-      //adUnitId: AdManager.bannerAdUnitId,
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: AdManager.bannerAdUnitId,
+      //adUnitId: BannerAd.testAdUnitId,
       size: AdSize.banner,
     );
     _loadBannerAd();
@@ -204,7 +204,10 @@ class _SettingsState extends State<Settings> {
                           EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                       child: Text(
                         'Feedback',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: DynamicTheme.of(context).data.primaryColor,
+                        ),
                       )),
                   Divider(),
                   ListTile(
@@ -234,7 +237,10 @@ class _SettingsState extends State<Settings> {
                     padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                     child: Text(
                       'More Information',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: DynamicTheme.of(context).data.primaryColor,
+                      ),
                     ),
                   ),
                   Divider(),

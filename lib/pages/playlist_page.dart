@@ -82,42 +82,44 @@ class _PlaylistPageState extends State<PlaylistPage> {
                 elevation: menuElevation,
               ),
             ),
-            ListView.builder(
-              padding: EdgeInsets.only(bottom: 8, right: 8, left: 8),
-              shrinkWrap: true,
-              itemCount: count,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(30),
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.only(bottom: 8, right: 8, left: 8),
+                shrinkWrap: true,
+                itemCount: count,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(30),
+                      ),
                     ),
-                  ),
-                  elevation: itemElevation,
-                  child: ListTile(
-                    leading: IconButton(
-                      icon: Icon(Icons.play_arrow),
-                      onPressed: () {
-                        Navigator.pop(
-                          context,
-                          playlists[index],
-                        );
+                    elevation: itemElevation,
+                    child: ListTile(
+                      leading: IconButton(
+                        icon: Icon(Icons.play_arrow),
+                        onPressed: () {
+                          Navigator.pop(
+                            context,
+                            playlists[index],
+                          );
+                        },
+                      ),
+                      title: Text(playlists[index].title, maxLines: 1),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          _delete(context, this.playlists[index].id);
+                        },
+                      ),
+                      onTap: () {
+                        navigateToDetail(
+                            playlists[index], playlists[index].title);
                       },
                     ),
-                    title: Text(playlists[index].title, maxLines: 1),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        _delete(context, this.playlists[index].id);
-                      },
-                    ),
-                    onTap: () {
-                      navigateToDetail(
-                          playlists[index], playlists[index].title);
-                    },
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ],
         ),

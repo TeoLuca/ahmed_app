@@ -192,6 +192,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
                       setupVideoPlayerController(file.path);
                     sharedPreferences.setString(
                         'LAST_PLAYED_VIDEO_URI', file.path);
+                    file = null;
                   }
                 },
               ),
@@ -272,6 +273,7 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
                       setupVideoPlayerController(file.path);
                     sharedPreferences.setString(
                         'LAST_PLAYED_VIDEO_URI', file.path);
+                    file = null;
                   }
                 },
               )

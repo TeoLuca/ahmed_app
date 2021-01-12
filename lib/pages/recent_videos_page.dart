@@ -47,8 +47,8 @@ class _RecentVideosPageState extends State<RecentVideosPage> {
   void initState() {
     super.initState();
     _bannerAd = BannerAd(
-      //adUnitId: AdManager.bannerAdUnitId,
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: AdManager.bannerAdUnitId,
+      //adUnitId: BannerAd.testAdUnitId,
       size: AdSize.banner,
     );
     _loadBannerAd();
@@ -79,7 +79,7 @@ class _RecentVideosPageState extends State<RecentVideosPage> {
               Padding(
                 padding: EdgeInsets.all(8),
                 child: AppBar(
-                  title: Text('Recent Videos'),
+                  title: Text('History'),
                   shape: appBarShape,
                   elevation: menuElevation,
                 ),

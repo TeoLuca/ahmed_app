@@ -48,6 +48,7 @@ class _MyAppState extends State<MyApp> {
           );
           setupTheme();
           return new MaterialApp(
+            title: 'Bee Player',
             debugShowCheckedModeBanner: false,
             theme: theme,
             home: Home(),

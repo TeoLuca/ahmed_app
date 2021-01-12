@@ -102,8 +102,8 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
   void initState() {
     super.initState();
     _bannerAd = BannerAd(
-      //adUnitId: AdManager.bannerAdUnitId,
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: AdManager.bannerAdUnitId,
+      //adUnitId: BannerAd.testAdUnitId,
       size: AdSize.banner,
     );
     if (playlist.title.length == 0) {
